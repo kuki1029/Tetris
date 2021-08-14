@@ -1,2 +1,4 @@
 
-#testing if works
+import pyglet
+
+print("Hello")
