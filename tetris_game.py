@@ -1,15 +1,34 @@
-import pyglet
+import pygame
 
+pygame.font.init()
 
 class tetris:
+    # Colors
+    lIGHTGRAY = (232, 228, 236)
 
-    def __init__(self, window_width, window_length):
-        self.screen_width = window_width
-        self.screen_length = window_length
+    # Fonts
+    font = pygame.font.SysFont('segoeui', 30)
 
+    # Constructor
+    def __init__(self, screen):
+        self.screen = screen
+
+    # Draws main features of the background including the outlines and text
     def draw_background(self):
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS,
-                             ('v2i', [225, 525,
-                                      225, 75,
-                                      475, 75,
-                                      475, 525]))
+
+        # Outline for blocks
+        pygame.draw.rect(self.screen, self.lIGHTGRAY, (300, 80, 200, 400), 1)
+
+        # Outline and text for next block box
+        pygame.draw.rect(self.screen, self.lIGHTGRAY, (522, 120, 84, 60), 1)
+        textsurface = self.font.render('NEXT', True, self.lIGHTGRAY)
+        self.screen.blit(textsurface, (532, 84))
+
+        # Outline and text for hold box
+        pygame.draw.rect(self.screen, self.lIGHTGRAY, (190, 120, 84, 60), 1)
+        textsurface = self.font.render('HOLD', True, self.lIGHTGRAY)
+        self.screen.blit(textsurface, (193, 84))
+
+        # Score text
+        textsurface = self.font.render('SCORE:'+' 0', True, self.lIGHTGRAY)
+        self.screen.blit(textsurface, (300, 40))
