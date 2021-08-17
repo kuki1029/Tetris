@@ -38,15 +38,21 @@ def main():
     # Main while loop for all of games functions
     run = True
     while run:
-        clock.tick(1)
+        clock.tick(8)
         # Closes pygaem window if exit is clicked by user
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    tetrisGame.horizontalMovement(True)
+                elif event.key == pygame.K_RIGHT:
+                    tetrisGame.horizontalMovement(False)
 
         drawBackground()
-        drawBoard()
         tetrisGame.gameLoop()
+        drawBoard()
+
         drawCurrentPiece()
         #print(np.array(tetrisGame.get_gameboard()))
         pygame.display.update()
@@ -92,12 +98,18 @@ def drawCurrentPiece():
     pos = tetrisGame.currentPos()
     shape = tetrisGame.getCurrentPiece()
     # If the y value of
-    if pos[1] > 1:
-        print(pos)
+    if pos[1] >= 1:
         for row in range(len(shape)):
             for col in range(len(shape[0])):
                 if shape[row][col] != 0:
-                    pygame.draw.rect(screen, BLOCKCOLORS[(shape[row][col] - 1)] , (300 + (blockSize * pos[0]) + (blockSize * col), 40 + (blockSize * pos[1]) + (blockSize * row), blockSize, blockSize))
+                    xBlock = 300 + (blockSize * pos[0]) + (blockSize * col)
+                    yBlock = 40 + (blockSize * pos[1]) + (blockSize * row)
+                    # This first if statement makes it so the block looks like it is coming out of the top of the border
+                    if pos[1] == 1:
+                        if row > 0:
+                            pygame.draw.rect(screen, BLOCKCOLORS[(shape[row][col] - 1)], (xBlock, yBlock, blockSize, blockSize))
+                    else:
+                        pygame.draw.rect(screen, BLOCKCOLORS[(shape[row][col] - 1)] , (xBlock, yBlock, blockSize, blockSize))
 
 
 
