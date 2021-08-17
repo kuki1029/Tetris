@@ -1,34 +1,123 @@
 import pygame
+import random
 
-pygame.font.init()
+
+shapes = [
+    [[1,1],
+     [1,1]],
+
+    [[2,0,0,0],
+     [2,2,2,2]],
+
+    [[0,0,0,3],
+     [3,3,3,3]],
+
+    [[0,4,0],
+     [4,4,4]],
+
+    [[5,5,5,5]],
+
+    [[0,6,6],
+     [6,6,0]],
+
+    [[7,7,0],
+     [0,7,7]]
+]
+
+
+
 
 class tetris:
-    # Colors
-    lIGHTGRAY = (232, 228, 236)
 
-    # Fonts
-    font = pygame.font.SysFont('segoeui', 30)
 
     # Constructor
-    def __init__(self, screen):
-        self.screen = screen
+    def __init__(self):
+        self.xPos = 0
+        self.yPos = 0
+        self.currentShape = [[0]]
+        self.landed = True
+        self.gameBoard = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 3, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 3, 0, 0, 0, 0, 0],
+                     [0, 0, 6, 6, 3, 3, 4, 2, 2, 0],
+                     [0, 6, 6, 7, 7, 4, 4, 2, 1, 1],
+                     [5, 5, 5, 5, 7, 7, 4, 2, 1, 1], ]
+        self.gameBoard2 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ]
 
-    # Draws main features of the background including the outlines and text
-    def draw_background(self):
+    # Runs some of the games main functions here
+    def gameLoop(self):
+        self.spawn_piece()
+        self.movePieceDown()
 
-        # Outline for blocks
-        pygame.draw.rect(self.screen, self.lIGHTGRAY, (300, 80, 200, 400), 1)
 
-        # Outline and text for next block box
-        pygame.draw.rect(self.screen, self.lIGHTGRAY, (522, 120, 84, 60), 1)
-        textsurface = self.font.render('NEXT', True, self.lIGHTGRAY)
-        self.screen.blit(textsurface, (532, 84))
+    # Will spawn a piece if a piece doesn't already exist and hasn't landed
+    def spawn_piece(self):
+        if self.landed:
+            rand = random.randint(0, 6)
+            self.currentShape = shapes[rand]
+            # If the shapes is the straight line, then we start the piece a bit lower.
+            self.xPos = 4
+            self.yPos = 0
+            self.landed = False
 
-        # Outline and text for hold box
-        pygame.draw.rect(self.screen, self.lIGHTGRAY, (190, 120, 84, 60), 1)
-        textsurface = self.font.render('HOLD', True, self.lIGHTGRAY)
-        self.screen.blit(textsurface, (193, 84))
 
-        # Score text
-        textsurface = self.font.render('SCORE:'+' 0', True, self.lIGHTGRAY)
-        self.screen.blit(textsurface, (300, 40))
+
+    # Will move the piece down on the board by increasing the y coordinates
+    def movePieceDown(self):
+        if not self.landed:
+            self.yPos += 1
+            print(self.yPos)
+
+    # Does a check if the current moving piece has landed or not
+    def hasItLanded(self):
+        pass
+
+    # Returns the position of the current piece so the main function can draw it
+    def currentPos(self):
+        return [self.xPos, self.yPos]
+
+    # Will return the board array to the main function
+    def get_gameboard(self):
+            return self.gameBoard
+
+    # Will return the current piece
+    def getCurrentPiece(self):
+            return self.currentShape
+
