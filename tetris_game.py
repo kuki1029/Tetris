@@ -1,6 +1,6 @@
 import pygame
 import random
-
+import numpy as np
 
 shapes = [
     [[1,1],
@@ -32,33 +32,34 @@ class tetris:
 
     # Constructor
     def __init__(self):
-        self.xPos = 0
+        self.xPos = 4
         self.yPos = 0
-        self.currentShape = [[0]]
-        self.landed = True
-        self.gameBoard = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 3, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 3, 0, 0, 0, 0, 0],
-                     [0, 0, 6, 6, 3, 3, 4, 2, 2, 0],
-                     [0, 6, 6, 7, 7, 4, 4, 2, 1, 1],
-                     [5, 5, 5, 5, 7, 7, 4, 2, 1, 1], ]
+        self.currentShape = shapes[random.randint(0, 6)]
+        self.nextShape = shapes[random.randint(0, 6)]
+        self.landed = False
         self.gameBoard2 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 5, 6, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 4, 5, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 3, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 3, 3, 2, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 4, 1, 0, 0, 0],
+                     [0, 0, 6, 6, 3, 3, 4, 2, 2, 0],
+                     [0, 0, 0, 0, 7, 4, 4, 2, 1, 1],
+                     [0, 0, 0, 0, 7, 7, 4, 2, 1, 1] ]
+        self.gameBoard = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -79,20 +80,28 @@ class tetris:
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ]
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        self.width = 10
+        self.length = 22
+        self.loopCounter = 0
 
     # Runs some of the games main functions here
     def gameLoop(self):
-        self.hasItLanded()
         self.spawn_piece()
-        self.movePieceDown()
+        # Moves the block down slowly buy allows to move sideways or rotate faster
+        if self.loopCounter > 5:
+            self.hasItLanded()
+            self.movePieceDown()
+            self.loopCounter = 0
+        self.loopCounter += 1
 
 
     # Will spawn a piece if a piece doesn't already exist and hasn't landed
     def spawn_piece(self):
         if self.landed:
             rand = random.randint(0, 6)
-            self.currentShape = shapes[rand]
+            self.currentShape = self.nextShape[:]
+            self.nextShape = shapes[rand]
             # If the shapes is the straight line, then we start the piece a bit lower.
             self.xPos = 4
             self.yPos = 0
@@ -110,10 +119,15 @@ class tetris:
         row = (len(self.currentShape) - 1)
 
         for col in range(len(self.currentShape[0])):
-            if self.currentShape[row][col] != 0 and self.gameBoard[self.yPos + len(self.currentShape)][self.xPos + col] != 0:
+            if self.yPos + len(self.currentShape) >= self.length:
                 self.landed = True
-            elif self.gameBoard[self.yPos + len(self.currentShape) - 1][self.xPos + col] != 0:
+            elif self.currentShape[row][col] != 0 and self.gameBoard[self.yPos + len(self.currentShape)][self.xPos + col] != 0:
                 self.landed = True
+            elif self.currentShape[row - 1][col] != 0 and self.gameBoard[self.yPos + len(self.currentShape) - 1][self.xPos + col] != 0:
+                self.landed = True
+            elif len(self.currentShape) >= 2 and self.currentShape[row - 2][col] != 0 and self.gameBoard[self.yPos + len(self.currentShape) - 2][self.xPos + col] != 0:
+                self.landed = True
+
         if self.landed:
             self.addToBoard()
 
@@ -132,17 +146,15 @@ class tetris:
                 self.xPos = self.xPos - 1
             else:
                 self.xPos = self.xPos + 1
-                print(self.xPos)
 
     # Checks if it is possible to move the block to the left or the right
     # First we check if it is being moved outside the bounds
     def moveHorizontalPossible(self, toTheLeft):
-        if self.xPos > 0 and self.xPos < 10 - (len(self.currentShape[0])):
-            print("S")
+        if self.xPos > 0 and self.xPos < self.width - (len(self.currentShape[0])):
             return self.hittingAnotherBlock(toTheLeft)
         elif self.xPos == 0 and not toTheLeft:
             return self.hittingAnotherBlock(toTheLeft)
-        elif self.xPos == 10 - (len(self.currentShape[0])) and toTheLeft:
+        elif self.xPos == self.width - (len(self.currentShape[0])) and toTheLeft:
             return self.hittingAnotherBlock(toTheLeft)
         else:
             return False
@@ -153,23 +165,51 @@ class tetris:
             for row in range(len(self.currentShape)):
                 for col in range(len(self.currentShape[0])):
                     if self.currentShape[row][col] != 0:
-                        if self.gameBoard[self.yPos + row][self.xPos - 1] != 0:
-                            print("A")
+                        if self.gameBoard[self.yPos + row][self.xPos + col - 1] != 0:
                             return False
                         break
-            print("sss")
             return True
         else:
             for row in range(len(self.currentShape)):
                 for col in reversed(range(len(self.currentShape[0]))):
                     if self.currentShape[row][col] != 0:
-                        if self.gameBoard[self.yPos + row][self.xPos + len(self.currentShape[0])] != 0:
+                        if self.gameBoard[self.yPos + row][self.xPos + col + 1] != 0:
                             return False
                         break
             return True
 
+    # Rotates the piece
+    def rotatePiece(self, isItLeft):
+        if self.rotateOutOfBounds():
+            n = (len(self.currentShape))
+            m = len(self.currentShape[0])
+            newPiece = []
+            for x in range(m):
+                newPiece.append([])
+                for y in range (n):
+                    newPiece[x].append(0)
+            for x in range(n):
+                for y in range(m):
+                    newPiece[y][n-1-x] = self.currentShape[x][y]
+            if self.rotateIntoOtherBlock(newPiece):
+                self.currentShape = newPiece[:]
 
 
+    #Check if a rotate goes out of bounds
+    def rotateOutOfBounds(self):
+        if self.xPos + len(self.currentShape) > self.width:
+            return False
+        elif self.yPos + len(self.currentShape[0]) > self.length:
+            return False
+        else:
+            return True
+
+    def rotateIntoOtherBlock(self, newShape):
+        for row in range(len(newShape)):
+            for col in range(len(newShape[0])):
+                if newShape[row][col] != 0 and self.gameBoard[self.yPos + row][self.xPos + col] != 0:
+                    return False
+        return True
 
     # Returns the position of the current piece so the main function can draw it
     def currentPos(self):
@@ -182,4 +222,8 @@ class tetris:
     # Will return the current piece
     def getCurrentPiece(self):
             return self.currentShape
+
+    # Will return the new piece
+    def getNextPiece(self):
+        return self.nextShape
 
