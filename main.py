@@ -38,21 +38,30 @@ def main():
     # Main while loop for all of games functions
     run = True
     while run:
-        clock.tick(8)
+        clock.tick(10)
         # Closes pygaem window if exit is clicked by user
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    tetrisGame.horizontalMovement(True)
-                elif event.key == pygame.K_RIGHT:
-                    tetrisGame.horizontalMovement(False)
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
+                    tetrisGame.rotatePiece(False)
+                elif event.key == pygame.K_h:
+                    pass # Hold piece
+
+
+        # Checks which key is pressed
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            tetrisGame.horizontalMovement(True)
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            tetrisGame.horizontalMovement(False)
+
 
         drawBackground()
         tetrisGame.gameLoop()
         drawBoard()
-
+        drawNextPiece()
         drawCurrentPiece()
         #print(np.array(tetrisGame.get_gameboard()))
         pygame.display.update()
@@ -67,12 +76,12 @@ def drawBackground():
     pygame.draw.rect(screen, lIGHTGRAY, (299, 79, 202, 402), 1)
 
     # Outline and text for next block box
-    pygame.draw.rect(screen, lIGHTGRAY, (522, 120, 88, 60), 1)
+    pygame.draw.rect(screen, lIGHTGRAY, (522, 120, 88, 80), 1)
     textsurface = font.render('NEXT', True, lIGHTGRAY)
     screen.blit(textsurface, (532, 84))
 
     # Outline and text for hold box
-    pygame.draw.rect(screen, lIGHTGRAY, (190, 120, 84, 60), 1)
+    pygame.draw.rect(screen, lIGHTGRAY, (190, 120, 84, 80), 1)
     textsurface = font.render('HOLD', True, lIGHTGRAY)
     screen.blit(textsurface, (193, 84))
 
@@ -93,7 +102,7 @@ def drawBoard():
                 # bcoz we start the for loop at 2 instead of 0, we need to compensate for it in the y values for the pieces
                 pygame.draw.rect(screen, BLOCKCOLORS[(gameBoard[row][col] - 1)] , (300 + (blockSize * col), 40 + (blockSize * row), blockSize, blockSize))
 
-
+# Draws in the current piece
 def drawCurrentPiece():
     pos = tetrisGame.currentPos()
     shape = tetrisGame.getCurrentPiece()
@@ -111,6 +120,16 @@ def drawCurrentPiece():
                     else:
                         pygame.draw.rect(screen, BLOCKCOLORS[(shape[row][col] - 1)] , (xBlock, yBlock, blockSize, blockSize))
 
+# Draws in the next piece
+def drawNextPiece():
+    nextShape = tetrisGame.getNextPiece()
+    for row in range(len(nextShape)):
+        for col in range(len(nextShape[0])):
+            if nextShape[row][col] != 0:
+                # 566 is the X midpoint of the next outline and 150 is the Y midpoint
+                xBlock = (blockSize * col) + 566 - ((len(nextShape[0]) / 2) * blockSize)
+                yBlock = (blockSize * row) + 160 - (((len(nextShape)) / 2) * blockSize)
+                pygame.draw.rect(screen, BLOCKCOLORS[(nextShape[row][col] - 1)], (xBlock, yBlock, blockSize, blockSize))
 
 
 main()
