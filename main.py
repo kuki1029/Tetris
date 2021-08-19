@@ -103,7 +103,7 @@ def drawBackground():
     screen.blit(textsurface, (300, 40))
 
 # This takes in the tetris board array and draws in the colors according to the array
-# The array uses different numbers to show which colors should go there
+# The array uses different numbers to show which colors should go there.
 def drawBoard():
     gameBoard = tetrisGame.get_gameboard()
     # This for loop starts at 2 as our board array has two extra spots on the top to allow the pieces to spawn properly

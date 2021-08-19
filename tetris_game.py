@@ -335,7 +335,7 @@ class tetris:
 
 
 
-    # Returns the position of the current piece so the main function can draw it
+    # Returns the position of the current piece so the main function can draw it.
     def currentPos(self):
         return [self.xPos, self.yPos]
 
