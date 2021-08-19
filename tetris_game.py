@@ -32,11 +32,18 @@ class tetris:
 
     # Constructor
     def __init__(self):
+        # Describes the position of the current moving block
         self.xPos = 4
         self.yPos = 0
+
+        # These two arrays hold the current and next shape
         self.currentShape = shapes[random.randint(0, 6)]
         self.nextShape = shapes[random.randint(0, 6)]
+
+        # This lets the game know if the block has landed or reached the bottom
         self.landed = False
+
+        # The gameboard array
         self.gameBoard2 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -52,13 +59,13 @@ class tetris:
                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                      [0, 0, 0, 0, 5, 6, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 4, 5, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0,0, 0],
                      [0, 0, 0, 0, 3, 0, 0, 0, 0, 0],
                      [0, 0, 0, 0, 3, 3, 2, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 4, 1, 0, 0, 0],
-                     [0, 0, 6, 6, 3, 3, 4, 2, 2, 0],
-                     [0, 0, 0, 0, 7, 4, 4, 2, 1, 1],
-                     [0, 0, 0, 0, 7, 7, 4, 2, 1, 1] ]
+                     [1, 1, 1, 1, 1, 4, 1, 2, 2, 0],
+                     [1, 1, 6, 6, 3, 3, 4, 2, 2, 0],
+                     [0, 1, 1, 1, 7, 4, 4, 2, 1, 0],
+                     [1, 1, 1, 1, 7, 7, 4, 2, 1, 1] ]
         self.gameBoard = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -81,31 +88,71 @@ class tetris:
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-        self.width = 10
-        self.length = 22
+
+        # Dimensions of the gameboard
+        self.width = len(self.gameBoard[0])
+        self.length = len(self.gameBoard)
+
+        # Keeps track of how many loops are done
         self.loopCounter = 0
+
+        # Variables related to holding a piece
+        self.heldPiece = [[0]]
+        self.currentlyHolding = False
+        self.canHoldAgain = True
+
+        # Boolean to see if board is being cleared
+        self.isItBeingCleared = False
+
+        # Falling speed varialbes
+        self.fallingSpeed = 10
+
+        # Score variables
+        self.score = 90
+        self.scoreMultiplier = 1
 
     # Runs some of the games main functions here
     def gameLoop(self):
-        self.spawn_piece()
-        # Moves the block down slowly buy allows to move sideways or rotate faster
-        if self.loopCounter > 5:
-            self.hasItLanded()
-            self.movePieceDown()
-            self.loopCounter = 0
-        self.loopCounter += 1
+        if not self.isItBeingCleared:
+            # Moves the block down slowly buy allows to move sideways or rotate faster
+            if self.loopCounter > self.fallingSpeed:
+                self.hasItLanded()
+                self.movePieceDown()
+                self.loopCounter = 0
+        else:
+            if self.loopCounter > 5:
+                self.clearBoard()
+                self.score += 10 * self.scoreMultiplier
+                self.scoreMultiplier += 1
+                if not self.canBoardBeCleared():
+                    self.isItBeingCleared = False
+                    self.canHoldAgain = True
+                    self.spawn_piece()
+                    if self.score < 100:
+                        self.scoreMultiplier = 1
+                    elif self.score < 1000:
+                        self.scoreMultiplier = 5
+                    else:
+                        self.scoreMultiplier = 10
+                self.loopCounter = 0
+                if self.score < 100:
+                    self.fallingSpeed = 10
+                elif self.score < 1000:
+                    self.fallingSpeed = 5
+                else:
+                    self.fallingSpeed = 2
 
+        self.loopCounter += 1
 
     # Will spawn a piece if a piece doesn't already exist and hasn't landed
     def spawn_piece(self):
-        if self.landed:
-            rand = random.randint(0, 6)
-            self.currentShape = self.nextShape[:]
-            self.nextShape = shapes[rand]
-            # If the shapes is the straight line, then we start the piece a bit lower.
-            self.xPos = 4
-            self.yPos = 0
-            self.landed = False
+        rand = random.randint(0, 6)
+        self.currentShape = self.nextShape[:]
+        self.nextShape = shapes[rand]
+        # If the shapes is the straight line, then we start the piece a bit lower.
+        self.xPos = 4
+        self.yPos = 0
+        self.landed = False
 
 
 
@@ -130,6 +177,11 @@ class tetris:
 
         if self.landed:
             self.addToBoard()
+            if not self.canBoardBeCleared():
+                self.canHoldAgain = True
+                self.spawn_piece()
+            else:
+                self.isItBeingCleared = True
 
 
     # Adds the landed piece to the board
@@ -211,6 +263,78 @@ class tetris:
                     return False
         return True
 
+    #Hold piece
+    def holdPiece(self):
+        # This first one checks if it is the first time the user is holding a piece
+        # We need this as we cannot replace the current piece with an empty piece
+        if self.heldPiece == [[0]]:
+            self.canHoldAgain = False
+            self.heldPiece = self.currentShape[:]
+            self.spawn_piece()
+
+        # Checks if user is allowed to hold again or not according to tetris rules
+        elif self.canHoldAgain:
+            self.canHoldAgain = False
+            self.tempPiece = self.currentShape[:]
+            self.currentShape = self.heldPiece[:]
+            self.heldPiece = self.tempPiece[:]
+            self.nextShape = shapes[random.randint(0, 6)]
+            # If the shapes is the straight line, then we start the piece a bit lower.
+            self.xPos = 4
+            self.yPos = 0
+
+    # Will clear board
+    def clearBoard(self):
+        for row in reversed(range(len(self.gameBoard))):
+            if self.checkRow(row):
+                del self.gameBoard[row]
+                self.gameBoard.insert(0,[0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+                break
+
+
+    #checks if anything can be cleared on the board and returns a bool
+    def canBoardBeCleared(self):
+        for row in range(len(self.gameBoard)):
+            if self.checkRow(row):
+                return True
+        return False
+
+    # Checks if the row needs to be cleared or not
+    def checkRow(self, row):
+        for col in range(len(self.gameBoard[0])):
+            if self.gameBoard[row][col] == 0:
+                return False
+        return True
+
+    #Make the block fall faster
+    def fallFaster(self, pressed):
+        if pressed:
+            self.fallingSpeed = 1
+        else:
+            self.fallingSpeed = 10
+
+    # This determines the position where the block would fall hypothetically
+    def hypotheticalFallLocation(self):
+        tempYpos = self.yPos
+
+        # These are checks to see if the hypothetical block has landed
+        for y in range(tempYpos, len(self.gameBoard)):
+            row = (len(self.currentShape) - 1)
+            for col in range(len(self.currentShape[0])):
+                if y + len(self.currentShape) >= self.length:
+                    return [self.xPos, y]
+                elif self.currentShape[row][col] != 0 and self.gameBoard[y + len(self.currentShape)][
+                    self.xPos + col] != 0:
+                    return [self.xPos, y]
+                elif self.currentShape[row - 1][col] != 0 and self.gameBoard[y + len(self.currentShape) - 1][
+                    self.xPos + col] != 0:
+                    return [self.xPos, y]
+                elif len(self.currentShape) >= 2 and self.currentShape[row - 2][col] != 0 and \
+                        self.gameBoard[y + len(self.currentShape) - 2][self.xPos + col] != 0:
+                    return [self.xPos, y]
+
+
+
     # Returns the position of the current piece so the main function can draw it
     def currentPos(self):
         return [self.xPos, self.yPos]
@@ -226,4 +350,16 @@ class tetris:
     # Will return the new piece
     def getNextPiece(self):
         return self.nextShape
+
+    # Will return the held piece
+    def getHeldPiece(self):
+        return self.heldPiece
+
+    # Returns if the board is being cleared
+    def isBoardBeingCleared(self):
+        return self.isItBeingCleared
+
+    # Returns the score
+    def scoreNum(self):
+        return self.score
 
