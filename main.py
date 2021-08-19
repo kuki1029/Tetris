@@ -38,31 +38,42 @@ def main():
     # Main while loop for all of games functions
     run = True
     while run:
-        clock.tick(10)
+        clock.tick(40)
+        clearing = tetrisGame.isBoardBeingCleared()
         # Closes pygaem window if exit is clicked by user
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            elif event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN and not clearing:
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     tetrisGame.rotatePiece(False)
                 elif event.key == pygame.K_h:
-                    pass # Hold piece
+                    tetrisGame.holdPiece()
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    tetrisGame.horizontalMovement(True)
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    tetrisGame.horizontalMovement(False)
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    tetrisGame.fallFaster(True)
+            elif event.type == pygame.KEYUP and not clearing:
+                if event.key == pygame.K_DOWN:
+                    tetrisGame.fallFaster(False)
 
-
-        # Checks which key is pressed
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            tetrisGame.horizontalMovement(True)
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            tetrisGame.horizontalMovement(False)
-
-
-        drawBackground()
-        tetrisGame.gameLoop()
-        drawBoard()
-        drawNextPiece()
-        drawCurrentPiece()
+        if not clearing:
+            drawBackground()
+            tetrisGame.gameLoop()
+            drawBoard()
+            drawNextPiece()
+            drawHeldPiece()
+            drawCurrentPiece()
+            drawHypoPiece()
+            print(tetrisGame.hypotheticalFallLocation())
+        else:
+            drawBackground()
+            tetrisGame.gameLoop()
+            drawBoard()
+            drawNextPiece()
+            drawHeldPiece()
         #print(np.array(tetrisGame.get_gameboard()))
         pygame.display.update()
 
@@ -70,6 +81,8 @@ def main():
 
 # Draws main features of the background including the outlines and text
 def drawBackground():
+    score = tetrisGame.scoreNum()
+
     screen.fill(DARKPURPLE)
 
     # Outline for blocks
@@ -81,16 +94,16 @@ def drawBackground():
     screen.blit(textsurface, (532, 84))
 
     # Outline and text for hold box
-    pygame.draw.rect(screen, lIGHTGRAY, (190, 120, 84, 80), 1)
+    pygame.draw.rect(screen, lIGHTGRAY, (190, 120, 88, 80), 1)
     textsurface = font.render('HOLD', True, lIGHTGRAY)
-    screen.blit(textsurface, (193, 84))
+    screen.blit(textsurface, (195, 84))
 
     # Score text
-    textsurface = font.render('SCORE:' + ' 0', True, lIGHTGRAY)
+    textsurface = font.render('SCORE: ' + str(score), True, lIGHTGRAY)
     screen.blit(textsurface, (300, 40))
 
 # This takes in the tetris board array and draws in the colors according to the array
-# The array uses different numbers to show which colors should go there
+# The array uses different numbers to show which colors should go there.
 def drawBoard():
     gameBoard = tetrisGame.get_gameboard()
     # This for loop starts at 2 as our board array has two extra spots on the top to allow the pieces to spawn properly
@@ -126,10 +139,32 @@ def drawNextPiece():
     for row in range(len(nextShape)):
         for col in range(len(nextShape[0])):
             if nextShape[row][col] != 0:
-                # 566 is the X midpoint of the next outline and 150 is the Y midpoint
+                # 566 is the X midpoint of the next outline and 160 is the Y midpoint
                 xBlock = (blockSize * col) + 566 - ((len(nextShape[0]) / 2) * blockSize)
                 yBlock = (blockSize * row) + 160 - (((len(nextShape)) / 2) * blockSize)
                 pygame.draw.rect(screen, BLOCKCOLORS[(nextShape[row][col] - 1)], (xBlock, yBlock, blockSize, blockSize))
+
+# Draws in the next piece
+def drawHeldPiece():
+    heldShape = tetrisGame.getHeldPiece()
+    for row in range(len(heldShape)):
+        for col in range(len(heldShape[0])):
+            if heldShape[row][col] != 0:
+                # 234 is the X midpoint of the next outline and 160 is the Y midpoint
+                xBlock = (blockSize * col) + 234 - ((len(heldShape[0]) / 2) * blockSize)
+                yBlock = (blockSize * row) + 160 - (((len(heldShape)) / 2) * blockSize)
+                pygame.draw.rect(screen, BLOCKCOLORS[(heldShape[row][col] - 1)], (xBlock, yBlock, blockSize, blockSize))
+
+# Draws the hypothetical position
+def drawHypoPiece():
+    hypoPos = tetrisGame.hypotheticalFallLocation()
+    shape = tetrisGame.getCurrentPiece()
+    for row in range(len(shape)):
+        for col in range(len(shape[0])):
+            if shape[row][col] != 0:
+                xBlock = 300 + (blockSize * hypoPos[0]) + (blockSize * col)
+                yBlock = 40 + (blockSize * hypoPos[1]) + (blockSize * row)
+                pygame.draw.rect(screen, BLOCKCOLORS[(shape[row][col] - 1)], (xBlock, yBlock, blockSize, blockSize), 2)
 
 
 main()
