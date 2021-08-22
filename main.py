@@ -1,6 +1,8 @@
 import pygame
 import numpy as np
 from tetris_game import tetris
+
+
 pygame.init()
 pygame.font.init()
 
